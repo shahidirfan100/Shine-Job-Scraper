@@ -24,6 +24,15 @@
       "editor": "textfield",
       "prefill": "Bangalore"
     },
+    "datePosted": {
+      "title": "Job posting date filter",
+      "type": "string",
+      "description": "Filter jobs by how recently they were posted.",
+      "enum": ["anytime", "24hours", "7days", "30days", "90days"],
+      "enumTitles": ["Anytime", "Last 24 hours", "Last 7 days", "Last 30 days", "Last 90 days"],
+      "default": "anytime",
+      "editor": "select"
+    },
     "collectDetails": {
       "title": "Collect job details",
       "type": "boolean",

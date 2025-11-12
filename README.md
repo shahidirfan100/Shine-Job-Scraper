@@ -74,6 +74,7 @@ Extract detailed job market intelligence from Shine.com, India's largest job por
 | `keyword` | String | No | - | Search term (job title, skill, technology, company name) |
 | `location` | String | No | - | Geographic filter (city, state, region in India) |
 | `category` | String | No | - | Job category or industry sector |
+| `datePosted` | String | No | anytime | Filter jobs by posting date (anytime, 24hours, 7days, 30days, 90days) |
 | `startUrl` | String | No | - | Direct Shine.com search URL to begin scraping |
 | `startUrls` | Array | No | - | Multiple URLs for batch processing |
 | `results_wanted` | Number | No | 100 | Total jobs to collect (1-10000) |
@@ -123,6 +124,17 @@ Extract detailed job market intelligence from Shine.com, India's largest job por
 }
 ```
 *Targeted scraping of machine learning jobs in Pune*
+
+### Recent Jobs Only
+```json
+{
+  "keyword": "product manager",
+  "location": "Bangalore",
+  "datePosted": "7days",
+  "results_wanted": 50
+}
+```
+*Find product manager positions posted in the last 7 days in Bangalore*
 
 ### Multi-City Analysis
 ```json

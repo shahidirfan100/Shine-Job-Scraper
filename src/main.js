@@ -12,6 +12,7 @@ async function main() {
         const {
             keyword = '', location = '', category = '', results_wanted: RESULTS_WANTED_RAW = 100,
             max_pages: MAX_PAGES_RAW = 999, collectDetails = true, startUrl, startUrls, url, proxyConfiguration,
+            datePosted = 'anytime',
         } = input;
 
         const RESULTS_WANTED = Number.isFinite(+RESULTS_WANTED_RAW) ? Math.max(1, +RESULTS_WANTED_RAW) : Number.MAX_SAFE_INTEGER;
@@ -59,26 +60,32 @@ async function main() {
             return cheerioLoad(cleanedHtml).text().replace(/\s+/g, ' ').trim();
         };
 
-        const buildStartUrl = (kw, loc, cat) => {
+        const buildStartUrl = (kw, loc, cat, dateFilter) => {
             const base = 'https://www.shine.com/job-search/';
+            let url;
+            
             if (kw && loc) {
                 // Use query parameters like Shine.com does: ?q=keyword&qActual=keyword
                 const keywordSlug = String(kw).trim().toLowerCase().replace(/\s+/g, '-');
                 const locationSlug = String(loc).trim().toLowerCase().replace(/\s+/g, '-');
-                return `${base}${keywordSlug}-jobs-in-${locationSlug}`;
+                url = `${base}${keywordSlug}-jobs-in-${locationSlug}`;
             } else if (kw) {
                 const keywordSlug = String(kw).trim().toLowerCase().replace(/\s+/g, '-');
-                return `${base}${keywordSlug}-jobs`;
+                url = `${base}${keywordSlug}-jobs`;
             } else {
-                return `${base}jobs`;
+                url = `${base}jobs`;
             }
+            
+            // Note: Shine.com may not support date filtering in URLs
+            // Date filtering will be implemented as post-processing based on date_posted field
+            return url;
         };
 
         const initial = [];
         if (Array.isArray(startUrls) && startUrls.length) initial.push(...startUrls);
         if (startUrl) initial.push(startUrl);
         if (url) initial.push(url);
-        if (!initial.length) initial.push(buildStartUrl(keyword, location, category));
+        if (!initial.length) initial.push(buildStartUrl(keyword, location, category, datePosted));
 
         // Enhanced proxy configuration for anti-blocking
         const proxyConf = proxyConfiguration ? await Actor.createProxyConfiguration({
@@ -177,9 +184,9 @@ async function main() {
             proxyConfiguration: proxyConf,
             maxRequestRetries: 5, // Increased retries for better success
             useSessionPool: true,
-            maxConcurrency: 5, // Optimized for speed while maintaining stealth
+            maxConcurrency: 8, // Optimized for speed while maintaining stealth
             requestHandlerTimeoutSecs: 120, // Increased timeout
-            maxRequestsPerMinute: 40, // Balanced rate limiting for better performance
+            maxRequestsPerMinute: 60, // Balanced rate limiting for better performance
             preNavigationHooks: [
                 // Enhanced anti-blocking measures based on Shine.com headers
                 async ({ request, session }) => {
@@ -396,6 +403,38 @@ async function main() {
                             url: request.url,
                             scraped_at: new Date().toISOString(),
                         };
+
+                        // Apply date filtering if specified
+                        if (datePosted !== 'anytime' && data.date_posted) {
+                            const jobDate = new Date(data.date_posted);
+                            const now = new Date();
+                            let daysDiff;
+
+                            switch (datePosted) {
+                                case '24hours':
+                                    daysDiff = 1;
+                                    break;
+                                case '7days':
+                                    daysDiff = 7;
+                                    break;
+                                case '30days':
+                                    daysDiff = 30;
+                                    break;
+                                case '90days':
+                                    daysDiff = 90;
+                                    break;
+                                default:
+                                    daysDiff = 0;
+                            }
+
+                            if (daysDiff > 0) {
+                                const cutoffDate = new Date(now.getTime() - (daysDiff * 24 * 60 * 60 * 1000));
+                                if (jobDate < cutoffDate) {
+                                    // Job is too old, skip saving it
+                                    return;
+                                }
+                            }
+                        }
 
                         await Dataset.pushData(item);
                         saved++;
