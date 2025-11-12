@@ -159,7 +159,6 @@ Every job record includes comprehensive structured data:
 {
   "title": "Senior Software Engineer - Backend",
   "company": "Tech Mahindra Ltd.",
-  "category": "Information Technology",
   "location": "Pune, Maharashtra",
   "salary": "₹12,00,000 - ₹18,00,000 per year",
   "experience": "5-8 Years",
@@ -180,7 +179,6 @@ Every job record includes comprehensive structured data:
 |-------|-------------|---------|
 | `title` | Job position title | "Senior Software Engineer" |
 | `company` | Hiring organization | "Tech Mahindra Ltd." |
-| `category` | Job function/department | "Information Technology" |
 | `location` | Work location | "Pune, Maharashtra" |
 | `salary` | Compensation range | "₹12,00,000 - ₹18,00,000 per year" |
 | `experience` | Required experience | "5-8 Years" |
@@ -363,6 +361,7 @@ Configure webhooks to automatically receive data when scraping completes:
 ## 🔄 Changelog & Updates
 
 ### Recent Improvements
+- ✅ **Removed Unused Category Field**: Cleaned up dataset by removing unused category column
 - ✅ **Precise Job Limiting**: Script now stops exactly when desired number of jobs is reached
 - ✅ **Resource Efficiency**: No unnecessary requests when jobs aren't available
 - ✅ **Graceful Termination**: Stops pagination intelligently when no more jobs found

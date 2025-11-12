@@ -395,45 +395,9 @@ async function main() {
                             data.employment_type = $('[class*="employment"], [class*="job-type"]').first().text().trim() || null;
                         }
 
-                        // Extract category from various HTML selectors
-                        let extractedCategory = null;
-                        const categorySelectors = [
-                            '[class*="category"]',
-                            '.category',
-                            '[class*="job-category"]',
-                            '[class*="department"]',
-                            '[class*="function"]',
-                            '[class*="sector"]',
-                            '[data-testid*="category"]',
-                            '[class*="tag"]'
-                        ];
-
-                        for (const selector of categorySelectors) {
-                            const categoryEl = $(selector).first();
-                            if (categoryEl.length) {
-                                const categoryText = categoryEl.text().trim();
-                                if (categoryText && categoryText.length > 1 && categoryText.length < 100) {
-                                    extractedCategory = categoryText;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Also check for category in breadcrumbs or navigation
-                        if (!extractedCategory) {
-                            $('.breadcrumb a, .breadcrumbs a, [class*="breadcrumb"] a').each((_, el) => {
-                                const text = $(el).text().trim();
-                                if (text && !text.includes('Home') && !text.includes('Jobs') && text.length > 1 && text.length < 50) {
-                                    extractedCategory = text;
-                                    return false; // break
-                                }
-                            });
-                        }
-
                         const item = {
                             title: data.title || null,
                             company: data.company || null,
-                            category: extractedCategory || category || null, // Use extracted category first, then input category
                             location: data.location || null,
                             salary: data.salary || null,
                             experience: data.experience || null,
