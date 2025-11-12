@@ -28,8 +28,10 @@ Extract detailed job market intelligence from Shine.com, India's largest job por
 - **Posting Metadata**: Job posting dates, employment types, and application deadlines
 
 ### 🚀 Performance & Reliability
-- **High-Speed Scraping**: Process 20-50 jobs per minute with optimized performance
+- **High-Speed Scraping**: Process 40-80 jobs per minute with optimized performance
 - **Smart Pagination**: Automatically navigate through multiple result pages
+- **Precise Job Limits**: Stops exactly when desired number of jobs is reached
+- **Resource Efficient**: No unnecessary requests when jobs aren't available
 - **Anti-Detection Measures**: Built-in mechanisms to ensure consistent data collection
 - **Error Recovery**: Intelligent retry logic for maximum success rate
 - **Scalable Architecture**: Handle thousands of jobs in single execution
@@ -244,8 +246,8 @@ Configure webhooks to automatically receive data when scraping completes:
 |---------|-----------|---------------|-------------------|
 | `collectDetails` | `false` | `true` | `true` |
 | `results_wanted` | 100-500 | 500-2000 | 2000-10000 |
-| `maxConcurrency` | High | Medium | Low |
-| `Speed` | 50+ jobs/min | 30-50 jobs/min | 20-30 jobs/min |
+| `maxConcurrency` | High (10+) | Medium (8-10) | Low (5-8) |
+| `Speed` | 80+ jobs/min | 60-80 jobs/min | 40-60 jobs/min |
 | `Use Case` | Quick research | Standard analysis | Deep insights |
 
 ### Proxy Configuration
@@ -270,8 +272,8 @@ Configure webhooks to automatically receive data when scraping completes:
 ## 📊 Performance Metrics & Costs
 
 ### Speed & Throughput
-- **Basic Mode**: 40-60 jobs per minute
-- **Detailed Mode**: 20-40 jobs per minute
+- **Basic Mode**: 60-80 jobs per minute
+- **Detailed Mode**: 40-60 jobs per minute
 - **Batch Processing**: Up to 10,000 jobs per execution
 - **Concurrent Processing**: Multiple searches simultaneously
 
@@ -361,12 +363,17 @@ Configure webhooks to automatically receive data when scraping completes:
 ## 🔄 Changelog & Updates
 
 ### Recent Improvements
+- ✅ **Precise Job Limiting**: Script now stops exactly when desired number of jobs is reached
+- ✅ **Resource Efficiency**: No unnecessary requests when jobs aren't available
+- ✅ **Graceful Termination**: Stops pagination intelligently when no more jobs found
+- ✅ Enhanced performance with 10 concurrent requests for faster scraping
+- ✅ Optimized session management with larger session pools (50 sessions)
+- ✅ Improved rate limiting (80 requests/minute) while maintaining stealth
+- ✅ Intelligent delay algorithms based on session maturity
 - ✅ Enhanced data accuracy and completeness
-- ✅ Improved error handling and recovery
-- ✅ Optimized performance for large-scale scraping
+- ✅ Better error handling and recovery
 - ✅ Added comprehensive job category detection
-- ✅ Better handling of dynamic content
-- ✅ Improved proxy rotation and anti-detection
+- ✅ Improved handling of dynamic content
 
 ### Roadmap
 - 🔄 Real-time job posting monitoring

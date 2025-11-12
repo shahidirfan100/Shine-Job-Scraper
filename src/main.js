@@ -182,20 +182,29 @@ async function main() {
 
         const crawler = new CheerioCrawler({
             proxyConfiguration: proxyConf,
-            maxRequestRetries: 5, // Increased retries for better success
+            maxRequestRetries: 3, // Reduced retries for faster processing
             useSessionPool: true,
-            maxConcurrency: 8, // Optimized for speed while maintaining stealth
-            requestHandlerTimeoutSecs: 120, // Increased timeout
-            maxRequestsPerMinute: 60, // Balanced rate limiting for better performance
+            sessionPoolOptions: {
+                maxPoolSize: 50, // Larger session pool for better distribution
+                sessionOptions: {
+                    maxAgeSecs: 1800, // 30 minutes session lifetime
+                    maxUsageCount: 50, // Reuse sessions up to 50 times
+                }
+            },
+            maxConcurrency: 10, // Increased concurrency for production performance
+            requestHandlerTimeoutSecs: 90, // Optimized timeout for faster processing
+            maxRequestsPerMinute: 80, // Higher rate limit with smart session management
             preNavigationHooks: [
-                // Enhanced anti-blocking measures based on Shine.com headers
+                // Enhanced anti-blocking measures with optimized session handling
                 async ({ request, session }) => {
-                    // Rotate user agents with current Chrome versions
+                    // Expanded user agent rotation for better stealth
                     const userAgents = [
                         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                         'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
                         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+                        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
+                        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
                     ];
 
                     // Set comprehensive headers matching Shine.com expectations
@@ -219,15 +228,20 @@ async function main() {
                         'Priority': 'u=0, i',
                     };
 
-                    // Handle cookies properly - preserve session cookies
-                    if (session && session.cookies) {
-                        const cookieString = session.cookies.map(cookie =>
-                            `${cookie.name}=${cookie.value}`
-                        ).join('; ');
+                    // Enhanced cookie handling with session rotation
+                    if (session && session.cookies && session.cookies.length > 0) {
+                        const cookieString = session.cookies
+                            .filter(cookie => cookie.name && cookie.value) // Filter out invalid cookies
+                            .map(cookie => `${cookie.name}=${cookie.value}`)
+                            .join('; ');
                         if (cookieString) {
                             request.headers['Cookie'] = cookieString;
                         }
                     }
+
+                    // Add slight randomization to headers for better stealth
+                    const randomDelay = Math.floor(Math.random() * 100) + 50;
+                    request.headers['X-Requested-With'] = Math.random() > 0.5 ? 'XMLHttpRequest' : undefined;
                 }
             ],
             async requestHandler({ request, $, enqueueLinks, log: crawlerLog }) {
@@ -235,25 +249,54 @@ async function main() {
                 const pageNo = request.userData?.pageNo || 1;
 
                 if (label === 'LIST') {
-                    const links = findJobLinks($, request.url);
-                    crawlerLog.info(`LIST ${request.url} -> found ${links.length} links`);
+                        const links = findJobLinks($, request.url);
+                        crawlerLog.info(`LIST ${request.url} -> found ${links.length} links (page ${pageNo})`);
 
-                    if (collectDetails) {
-                        const remaining = RESULTS_WANTED - saved;
-                        const toEnqueue = links.slice(0, Math.max(0, remaining));
-                        if (toEnqueue.length) await enqueueLinks({ urls: toEnqueue, userData: { label: 'DETAIL' } });
-                    } else {
-                        const remaining = RESULTS_WANTED - saved;
-                        const toPush = links.slice(0, Math.max(0, remaining));
-                        if (toPush.length) { await Dataset.pushData(toPush.map(u => ({ url: u, _source: 'shine.com' }))); saved += toPush.length; }
-                    }
+                        let jobsFoundOnThisPage = 0;
 
-                    if (saved < RESULTS_WANTED && pageNo < MAX_PAGES) {
-                        const next = findNextPage($, request.url, request.url, pageNo);
-                        if (next) await enqueueLinks({ urls: [next], userData: { label: 'LIST', pageNo: pageNo + 1 } });
+                        if (collectDetails) {
+                            const remaining = RESULTS_WANTED - saved;
+                            const toEnqueue = links.slice(0, Math.max(0, remaining));
+                            if (toEnqueue.length) {
+                                await enqueueLinks({
+                                    urls: toEnqueue,
+                                    userData: { label: 'DETAIL' },
+                                    forefront: false // Process in background for better performance
+                                });
+                                jobsFoundOnThisPage = toEnqueue.length;
+                            }
+                        } else {
+                            const remaining = RESULTS_WANTED - saved;
+                            const toPush = links.slice(0, Math.max(0, remaining));
+                            if (toPush.length) {
+                                await Dataset.pushData(toPush.map(u => ({ url: u, _source: 'shine.com' })));
+                                saved += toPush.length;
+                                jobsFoundOnThisPage = toPush.length;
+                            }
+                        }
+
+                        // Only continue pagination if:
+                        // 1. We still need more jobs (saved < RESULTS_WANTED)
+                        // 2. We found jobs on this page (jobsFoundOnThisPage > 0)
+                        // 3. We haven't reached MAX_PAGES
+                        if (saved < RESULTS_WANTED && jobsFoundOnThisPage > 0 && pageNo < MAX_PAGES) {
+                            const next = findNextPage($, request.url, request.url, pageNo);
+                            if (next) {
+                                await enqueueLinks({
+                                    urls: [next],
+                                    userData: { label: 'LIST', pageNo: pageNo + 1 },
+                                    forefront: false
+                                });
+                            }
+                        } else if (saved >= RESULTS_WANTED) {
+                            // Reached desired number of jobs, stop gracefully
+                            crawlerLog.info(`Reached desired number of jobs (${RESULTS_WANTED}). Stopping pagination.`);
+                        } else if (jobsFoundOnThisPage === 0 && saved < RESULTS_WANTED) {
+                            // No more jobs available, stop gracefully
+                            crawlerLog.info(`No more jobs found on page ${pageNo}. Stopping pagination. Total jobs collected: ${saved}/${RESULTS_WANTED}`);
+                        }
+                        return;
                     }
-                    return;
-                }
 
                 if (label === 'DETAIL') {
                     if (saved >= RESULTS_WANTED) return;
@@ -439,8 +482,11 @@ async function main() {
                         await Dataset.pushData(item);
                         saved++;
 
-                        // Add random delay between requests to be more stealthy
-                        await new Promise(resolve => setTimeout(resolve, Math.random() * 2000 + 1000));
+                        // Intelligent delay based on session usage for optimal stealth-performance balance
+                        const sessionUsage = request.session?.usageCount || 0;
+                        const baseDelay = Math.max(200, 1000 - (sessionUsage * 50)); // Reduce delay as session matures
+                        const randomDelay = Math.random() * baseDelay + 300;
+                        await new Promise(resolve => setTimeout(resolve, randomDelay));
 
                     } catch (err) {
                         crawlerLog.error(`DETAIL ${request.url} failed: ${err.message}`);
