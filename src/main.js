@@ -23,9 +23,40 @@ async function main() {
 
         const cleanText = (html) => {
             if (!html) return '';
+
+            // First, remove all data attributes from HTML
+            html = html.replace(/ data-[^=]*="[^"]*"/g, '').replace(/ data-[^=]*='[^']*'/g, '');
+
             const $ = cheerioLoad(html);
-            $('script, style, noscript, iframe').remove();
-            return $.root().text().replace(/\s+/g, ' ').trim();
+
+            // Remove unwanted elements
+            $('script, style, noscript, iframe, nav, header, footer, aside, form, input, button, select, textarea').remove();
+
+            // Keep only text-related tags and remove their attributes (except basic formatting)
+            const allowedTags = ['p', 'br', 'strong', 'em', 'b', 'i', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span', 'div'];
+
+            // Remove attributes from allowed tags (keep only basic formatting)
+            $('*').each((_, el) => {
+                const tagName = el.tagName.toLowerCase();
+                if (allowedTags.includes(tagName)) {
+                    // Keep only basic attributes for formatting tags
+                    const keepAttrs = tagName === 'a' ? ['href'] : [];
+                    const attrs = el.attributes;
+                    for (let i = attrs.length - 1; i >= 0; i--) {
+                        const attr = attrs[i];
+                        if (!keepAttrs.includes(attr.name)) {
+                            $(el).removeAttr(attr.name);
+                        }
+                    }
+                } else {
+                    // Remove the element but keep its text content
+                    $(el).replaceWith($(el).text());
+                }
+            });
+
+            // Get the cleaned HTML and then extract text
+            const cleanedHtml = $.html();
+            return cheerioLoad(cleanedHtml).text().replace(/\s+/g, ' ').trim();
         };
 
         const buildStartUrl = (kw, loc, cat) => {
@@ -146,9 +177,9 @@ async function main() {
             proxyConfiguration: proxyConf,
             maxRequestRetries: 5, // Increased retries for better success
             useSessionPool: true,
-            maxConcurrency: 3, // Further reduced for stealth
+            maxConcurrency: 5, // Optimized for speed while maintaining stealth
             requestHandlerTimeoutSecs: 120, // Increased timeout
-            maxRequestsPerMinute: 20, // More conservative rate limiting
+            maxRequestsPerMinute: 40, // Balanced rate limiting for better performance
             preNavigationHooks: [
                 // Enhanced anti-blocking measures based on Shine.com headers
                 async ({ request, session }) => {
@@ -314,10 +345,45 @@ async function main() {
                             data.employment_type = $('[class*="employment"], [class*="job-type"]').first().text().trim() || null;
                         }
 
+                        // Extract category from various HTML selectors
+                        let extractedCategory = null;
+                        const categorySelectors = [
+                            '[class*="category"]',
+                            '.category',
+                            '[class*="job-category"]',
+                            '[class*="department"]',
+                            '[class*="function"]',
+                            '[class*="sector"]',
+                            '[data-testid*="category"]',
+                            '[class*="tag"]'
+                        ];
+
+                        for (const selector of categorySelectors) {
+                            const categoryEl = $(selector).first();
+                            if (categoryEl.length) {
+                                const categoryText = categoryEl.text().trim();
+                                if (categoryText && categoryText.length > 1 && categoryText.length < 100) {
+                                    extractedCategory = categoryText;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Also check for category in breadcrumbs or navigation
+                        if (!extractedCategory) {
+                            $('.breadcrumb a, .breadcrumbs a, [class*="breadcrumb"] a').each((_, el) => {
+                                const text = $(el).text().trim();
+                                if (text && !text.includes('Home') && !text.includes('Jobs') && text.length > 1 && text.length < 50) {
+                                    extractedCategory = text;
+                                    return false; // break
+                                }
+                            });
+                        }
+
                         const item = {
                             title: data.title || null,
                             company: data.company || null,
-                            category: category || null,
+                            category: extractedCategory || category || null, // Use extracted category first, then input category
                             location: data.location || null,
                             salary: data.salary || null,
                             experience: data.experience || null,
