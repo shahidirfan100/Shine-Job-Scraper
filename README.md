@@ -1,386 +1,190 @@
-# Shine.com Jobs Scraper - India's Leading Job Portal Data Extraction
+# Shine.com Jobs Scraper
 
-> **Professional Job Data Scraper** - Extract comprehensive job listings from Shine.com, India's premier job search platform with millions of active job postings
+Extract comprehensive job listings from Shine.com, India's premier job search platform. Collect detailed job data including salaries, skills, company information, and descriptions at scale. Perfect for recruitment agencies, HR analytics, and job market research.
 
-Extract detailed job market intelligence from Shine.com, India's largest job portal. This powerful scraper collects complete job data including salaries, skills, company information, and detailed descriptions. Perfect for recruitment agencies, HR analytics, job market research, and competitive intelligence.
+## Features
 
-## 🎯 What You Can Achieve
+- **Complete Job Data** — Extract titles, companies, locations, salaries, and full descriptions
+- **Advanced Filtering** — Search by keywords, locations, and posting dates
+- **Skill Extraction** — Capture required skills and qualifications automatically
+- **Pagination Support** — Handle large result sets with automatic page navigation
+- **Structured Output** — Clean JSON data ready for analysis and integration
 
-- **Job Market Analysis**: Track salary trends, skill demands, and industry growth across Indian job market
-- **Recruitment Intelligence**: Identify top companies hiring, popular job categories, and location-based opportunities
-- **Competitive Research**: Monitor competitor hiring patterns and talent acquisition strategies
-- **Career Insights**: Analyze job requirements, experience levels, and skill gaps in various industries
-- **Business Intelligence**: Gather data for workforce planning, training programs, and market expansion
+## Use Cases
 
-## ✨ Key Features & Capabilities
+### Recruitment Intelligence
+Identify top hiring companies and track job market trends. Analyze skill demands and salary ranges across industries.
 
-### 🔍 Advanced Job Search & Filtering
-- **Keyword-Based Search**: Search by job titles, skills, technologies, or company names
-- **Location Targeting**: Filter jobs by cities, states, or regions across India
-- **Category Filtering**: Extract jobs from specific industries and departments
-- **Custom URL Support**: Scrape specific search results or job categories
+### Market Research
+Gather comprehensive job data for workforce planning and talent acquisition strategies. Monitor industry growth and hiring patterns.
 
-### 📊 Comprehensive Data Extraction
-- **Complete Job Details**: Title, company, location, salary range, experience requirements
-- **Rich Descriptions**: Full job descriptions with formatting preserved
-- **Skills & Technologies**: Extract required skills, tools, and qualifications
-- **Company Information**: Hiring company details and industry classification
-- **Posting Metadata**: Job posting dates, employment types, and application deadlines
+### Competitive Analysis
+Track competitor hiring activities and talent acquisition strategies. Understand market positioning and recruitment effectiveness.
 
-### 🚀 Performance & Reliability
-- **High-Speed Scraping**: Process 40-80 jobs per minute with optimized performance
-- **Smart Pagination**: Automatically navigate through multiple result pages
-- **Precise Job Limits**: Stops exactly when desired number of jobs is reached
-- **Resource Efficient**: No unnecessary requests when jobs aren't available
-- **Anti-Detection Measures**: Built-in mechanisms to ensure consistent data collection
-- **Error Recovery**: Intelligent retry logic for maximum success rate
-- **Scalable Architecture**: Handle thousands of jobs in single execution
+### Career Planning
+Research job requirements, experience levels, and skill gaps in target industries. Make informed career decisions with real market data.
 
-### 💾 Structured Data Output
-- **JSON Schema**: Consistent, machine-readable data format
-- **Database Ready**: Direct integration with analytics tools and databases
-- **API Compatible**: Easy integration with existing HR and recruitment systems
-- **Export Options**: Multiple download formats for different use cases
-
-## 📈 Use Cases & Applications
-
-### For Recruitment Agencies
-- **Lead Generation**: Identify companies with active hiring needs
-- **Market Intelligence**: Track demand for specific skills and roles
-- **Client Prospecting**: Find companies in expansion mode
-
-### For HR Departments
-- **Salary Benchmarking**: Compare compensation across industries and locations
-- **Skills Gap Analysis**: Identify trending technologies and qualifications
-- **Talent Pool Mapping**: Understand regional talent availability
-
-### For Job Portals & Career Platforms
-- **Content Aggregation**: Enrich job listings with additional data
-- **Market Research**: Analyze job market trends and patterns
-- **Competitive Analysis**: Compare job offerings across platforms
-
-### For Educational Institutions
-- **Curriculum Development**: Align courses with industry skill requirements
-- **Career Counseling**: Provide data-driven career guidance
-- **Industry Partnerships**: Identify collaboration opportunities
-
-### For Business Intelligence
-- **Workforce Planning**: Predict hiring trends and skill demands
-- **Market Expansion**: Identify high-growth regions and industries
-- **Investment Research**: Analyze employment patterns for business decisions
-
-## 📥 Input Parameters & Configuration
+## Input Parameters
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `keyword` | String | No | - | Search term (job title, skill, technology, company name) |
-| `location` | String | No | - | Geographic filter (city, state, region in India) |
-| `category` | String | No | - | Job category or industry sector |
-| `datePosted` | String | No | anytime | Filter jobs by posting date (anytime, 24hours, 7days, 30days, 90days) |
-| `startUrl` | String | No | - | Direct Shine.com search URL to begin scraping |
-| `startUrls` | Array | No | - | Multiple URLs for batch processing |
-| `results_wanted` | Number | No | 100 | Total jobs to collect (1-10000) |
-| `max_pages` | Number | No | 999 | Maximum search pages to process |
-| `collectDetails` | Boolean | No | true | Extract full job descriptions |
-| `proxyConfiguration` | Object | No | - | Proxy settings for enhanced reliability |
+| `startUrl` | String | No | — | Specific Shine.com search URL to start scraping |
+| `keyword` | String | No | — | Job search keywords (e.g., 'software engineer') |
+| `location` | String | No | — | Location filter (e.g., 'Bangalore', 'Mumbai') |
+| `collectDetails` | Boolean | No | `true` | Whether to fetch detailed job descriptions |
+| `datePosted` | String | No | `"anytime"` | Filter by posting date (anytime, 24hours, 7days, 30days, 90days) |
+| `results_wanted` | Integer | No | `100` | Maximum number of jobs to collect |
+| `max_pages` | Integer | No | `20` | Maximum search result pages to process |
+| `proxyConfiguration` | Object | No | Residential proxies | Proxy settings for reliable scraping |
 
-## 🎯 Quick Start Examples
+## Output Data
+
+Each job listing in the dataset contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `title` | String | Job position title |
+| `company` | String | Hiring company name |
+| `location` | String | Job location |
+| `salary` | String | Salary range or information |
+| `experience` | String | Required experience level |
+| `skills` | Array | Required skills and qualifications |
+| `industry` | String | Industry classification |
+| `employment_type` | String | Full-time, part-time, etc. |
+| `date_posted` | String | When the job was posted |
+| `url` | String | Direct link to the job posting |
+| `scraped_at` | String | Timestamp of data collection |
+
+## Usage Examples
 
 ### Basic Job Search
-```json
-{
-  "keyword": "software engineer",
-  "location": "Bangalore",
-  "results_wanted": 50
-}
-```
-*Collects 50 software engineering jobs in Bangalore*
 
-### Industry-Specific Research
-```json
-{
-  "keyword": "data scientist",
-  "location": "Mumbai",
-  "category": "IT",
-  "results_wanted": 200
-}
-```
-*Extracts data science positions in Mumbai's IT sector*
+Extract software engineering jobs in Bangalore:
 
-### Company Hiring Analysis
 ```json
 {
-  "keyword": "developer",
-  "location": "Delhi",
-  "results_wanted": 100,
-  "collectDetails": true
+    "keyword": "software engineer",
+    "location": "Bangalore",
+    "results_wanted": 50
 }
 ```
-*Comprehensive developer job data from Delhi with full descriptions*
+
+### Recent Postings Only
+
+Find jobs posted in the last 7 days:
+
+```json
+{
+    "keyword": "data analyst",
+    "datePosted": "7days",
+    "results_wanted": 100
+}
+```
 
 ### Custom Search URL
-```json
-{
-  "startUrl": "https://www.shine.com/job-search/machine-learning-jobs-in-pune",
-  "results_wanted": 150
-}
-```
-*Targeted scraping of machine learning jobs in Pune*
 
-### Recent Jobs Only
-```json
-{
-  "keyword": "product manager",
-  "location": "Bangalore",
-  "datePosted": "7days",
-  "results_wanted": 50
-}
-```
-*Find product manager positions posted in the last 7 days in Bangalore*
-
-### Multi-City Analysis
-```json
-{
-  "startUrls": [
-    "https://www.shine.com/job-search/marketing-jobs-in-mumbai",
-    "https://www.shine.com/job-search/marketing-jobs-in-delhi",
-    "https://www.shine.com/job-search/marketing-jobs-in-bangalore"
-  ],
-  "results_wanted": 300
-}
-```
-*Marketing job comparison across major Indian cities*
-
-## 📤 Complete Output Schema
-
-Every job record includes comprehensive structured data:
+Scrape from a specific Shine.com search page:
 
 ```json
 {
-  "title": "Senior Software Engineer - Backend",
-  "company": "Tech Mahindra Ltd.",
-  "location": "Pune, Maharashtra",
-  "salary": "₹12,00,000 - ₹18,00,000 per year",
-  "experience": "5-8 Years",
-  "skills": ["Java", "Spring Boot", "Microservices", "AWS", "Docker"],
-  "industry": "IT Services",
-  "employment_type": "Full-time",
-  "date_posted": "2024-11-12",
-  "description_html": "<div><p>We are looking for an experienced Backend Developer...</p></div>",
-  "description_text": "We are looking for an experienced Backend Developer to join our growing team...",
-  "url": "https://www.shine.com/jobs/senior-software-engineer-backend/tech-mahindra/pune/12345",
-  "scraped_at": "2024-11-12T14:30:00.000Z"
+    "startUrl": "https://www.shine.com/job-search/data-scientist-jobs-in-mumbai",
+    "collectDetails": true
 }
 ```
 
-### Data Fields Explained
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| `title` | Job position title | "Senior Software Engineer" |
-| `company` | Hiring organization | "Tech Mahindra Ltd." |
-| `location` | Work location | "Pune, Maharashtra" |
-| `salary` | Compensation range | "₹12,00,000 - ₹18,00,000 per year" |
-| `experience` | Required experience | "5-8 Years" |
-| `skills` | Required competencies | ["Java", "AWS", "Docker"] |
-| `industry` | Business sector | "IT Services" |
-| `employment_type` | Job type | "Full-time" |
-| `date_posted` | Posting date | "2024-11-12" |
-| `description_html` | Formatted job details | HTML content |
-| `description_text` | Plain text description | Clean text |
-| `url` | Job posting link | Direct Shine.com URL |
-| `scraped_at` | Data collection timestamp | ISO 8601 format |
-
-## 🚀 How to Use
-
-### Apify Platform (Recommended)
-
-1. **Access Actor Store**: Search for "Shine.com Jobs Scraper"
-2. **Create New Task**: Click "Try for free" or "Create task"
-3. **Configure Parameters**: Set your search criteria and preferences
-4. **Execute**: Run the actor and monitor real-time progress
-5. **Download Results**: Export data in your preferred format
-
-### API Integration
-
-```bash
-# Start scraping job
-curl -X POST "https://api.apify.com/v2/acts/your-actor-id/runs" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "keyword": "product manager",
-    "location": "Bangalore",
-    "results_wanted": 100
-  }'
-
-# Check run status
-curl "https://api.apify.com/v2/acts/your-actor-id/runs/RUN_ID" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-
-# Download results
-curl "https://api.apify.com/v2/acts/your-actor-id/runs/RUN_ID/dataset/items" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-```
-
-### Webhook Integration
-
-Configure webhooks to automatically receive data when scraping completes:
+## Sample Output
 
 ```json
 {
-  "webhookUrl": "https://your-app.com/webhook",
-  "webhookHeaders": {
-    "Authorization": "Bearer YOUR_WEBHOOK_TOKEN"
-  }
+    "title": "Senior Software Engineer",
+    "company": "Tech Solutions Pvt Ltd",
+    "location": "Bangalore, Karnataka",
+    "salary": "₹8,00,000 - ₹15,00,000 P.A.",
+    "experience": "3 to 8 years",
+    "skills": ["Java", "Spring Boot", "Microservices", "AWS"],
+    "industry": "IT Services & Consulting",
+    "employment_type": "Full Time",
+    "date_posted": "2024-02-10",
+    "url": "https://www.shine.com/jobs/senior-software-engineer/12345",
+    "scraped_at": "2024-02-15T10:30:00Z"
 }
 ```
 
-## ⚙️ Advanced Configuration
+## Tips for Best Results
 
-### Performance Tuning
+### Choose Effective Keywords
+- Use specific job titles and skills
+- Combine multiple relevant terms
+- Test different keyword combinations
 
-| Setting | Fast Mode | Balanced Mode | Comprehensive Mode |
-|---------|-----------|---------------|-------------------|
-| `collectDetails` | `false` | `true` | `true` |
-| `results_wanted` | 100-500 | 500-2000 | 2000-10000 |
-| `maxConcurrency` | High (10+) | Medium (8-10) | Low (5-8) |
-| `Speed` | 80+ jobs/min | 60-80 jobs/min | 40-60 jobs/min |
-| `Use Case` | Quick research | Standard analysis | Deep insights |
+### Optimize Location Filters
+- Use major city names for better results
+- Consider metropolitan areas
+- Test with and without location filters
+
+### Balance Collection Size
+- Start with smaller result sets for testing
+- Increase gradually for production runs
+- Monitor API rate limits and response times
 
 ### Proxy Configuration
 
+For reliable results, residential proxies are recommended:
+
 ```json
 {
-  "proxyConfiguration": {
-    "useApifyProxy": true,
-    "apifyProxyGroups": ["RESIDENTIAL"],
-    "apifyProxyCountry": "IN"
-  }
+    "proxyConfiguration": {
+        "useApifyProxy": true,
+        "apifyProxyGroups": ["RESIDENTIAL"]
+    }
 }
 ```
 
-### Error Handling
+## Integrations
 
-- **Automatic Retries**: Failed requests are automatically retried
-- **Graceful Degradation**: Continues processing even if some jobs fail
-- **Progress Tracking**: Real-time monitoring of scraping progress
-- **Detailed Logs**: Comprehensive error reporting and diagnostics
+Connect your job data with:
 
-## 📊 Performance Metrics & Costs
+- **Google Sheets** — Export for team analysis and reporting
+- **Airtable** — Build searchable job databases
+- **Slack** — Get notifications for new job postings
+- **Make** — Create automated recruitment workflows
+- **Zapier** — Trigger actions based on job criteria
 
-### Speed & Throughput
-- **Basic Mode**: 60-80 jobs per minute
-- **Detailed Mode**: 40-60 jobs per minute
-- **Batch Processing**: Up to 10,000 jobs per execution
-- **Concurrent Processing**: Multiple searches simultaneously
+### Export Formats
 
-### Resource Usage
-- **Memory**: 256-1024 MB (based on job volume)
-- **Compute Units**: 0.5-2.0 CU per 1000 jobs
-- **Network**: Optimized for minimal bandwidth usage
-- **Storage**: Efficient JSON compression
+Download data in multiple formats:
 
-### Cost Estimation
+- **JSON** — For developers and API integrations
+- **CSV** — For spreadsheet analysis and reporting
+- **Excel** — For business intelligence dashboards
 
-| Job Volume | Estimated Credits | Execution Time | Cost per Job |
-|------------|------------------|----------------|--------------|
-| 100 jobs | 0.1 - 0.3 | 2-5 minutes | ~0.001 credits |
-| 1,000 jobs | 1.0 - 3.0 | 15-30 minutes | ~0.002 credits |
-| 10,000 jobs | 10.0 - 30.0 | 2-4 hours | ~0.002 credits |
+## Frequently Asked Questions
 
-*Actual costs may vary based on proxy usage and data complexity*
+### How many jobs can I collect?
+You can collect up to the available jobs on Shine.com. The practical limit depends on your search criteria and proxy configuration.
 
-## 🔧 Troubleshooting Guide
+### Can I search for jobs in multiple locations?
+Yes, you can run separate actor instances for different locations or use broader search terms.
 
-### Common Issues & Solutions
+### What if some job details are missing?
+Some fields may be empty if the source doesn't provide that information. The actor collects all available data.
 
-#### No Results Found
-**Problem**: Actor returns empty dataset
-**Solutions**:
-- Verify keyword spelling and relevance
-- Check location format (use major city names)
-- Try broader search terms
-- Ensure URL format is correct for custom URLs
+### How often should I run the scraper?
+Job postings change frequently, so running daily or weekly is recommended for current data.
 
-#### Incomplete Job Data
-**Problem**: Missing descriptions or company information
-**Solutions**:
-- Set `collectDetails: true` for full descriptions
-- Check if jobs are still active on Shine.com
-- Verify proxy configuration for better access
+### Can I filter by salary range?
+The actor extracts available salary information, but Shine.com's search doesn't always support salary filtering in the interface.
 
-#### Slow Performance
-**Problem**: Scraping takes longer than expected
-**Solutions**:
-- Reduce `results_wanted` for faster execution
-- Set `collectDetails: false` if descriptions not needed
-- Use more specific search parameters
-- Enable proxy configuration
+## Support
 
-#### Rate Limiting
-**Problem**: Actor gets blocked or slowed down
-**Solutions**:
-- Enable residential proxies
-- Reduce concurrency settings
-- Add delays between requests
-- Use different IP ranges
+For issues or feature requests, contact support through the Apify Console.
 
-#### Data Quality Issues
-**Problem**: Inconsistent or malformed data
-**Solutions**:
-- Check Shine.com website for recent changes
-- Verify input parameters are correct
-- Review actor logs for parsing errors
-- Contact support for schema updates
+### Resources
 
-### Error Codes & Meanings
+- [Apify Documentation](https://docs.apify.com/)
+- [API Reference](https://docs.apify.com/api/v2)
+- [Scheduling Runs](https://docs.apify.com/schedules)
 
-| Error Code | Description | Resolution |
-|------------|-------------|------------|
-| `INVALID_URL` | Malformed search URL | Check URL format and parameters |
-| `NO_RESULTS` | Search returned no jobs | Try different keywords or locations |
-| `PROXY_ERROR` | Proxy connection failed | Enable Apify Proxy or check configuration |
-| `PARSE_ERROR` | HTML parsing failed | Website structure may have changed |
-| `RATE_LIMITED` | Too many requests | Reduce speed or enable proxies |
+## Legal Notice
 
-## 📞 Support & Resources
-
-### Getting Help
-- **Documentation**: Complete API reference and examples
-- **Community**: Join Apify community discussions
-- **Support**: Direct support through Apify platform
-- **Updates**: Regular improvements and feature additions
-
-### Best Practices
-- **Test First**: Run small batches before large extractions
-- **Monitor Usage**: Track costs and performance metrics
-- **Data Validation**: Always verify data quality and completeness
-- **Regular Updates**: Check for actor updates and improvements
-
-## 🔄 Changelog & Updates
-
-### Recent Improvements
-- ✅ **Removed Unused Category Field**: Cleaned up dataset by removing unused category column
-- ✅ **Precise Job Limiting**: Script now stops exactly when desired number of jobs is reached
-- ✅ **Resource Efficiency**: No unnecessary requests when jobs aren't available
-- ✅ **Graceful Termination**: Stops pagination intelligently when no more jobs found
-- ✅ Enhanced performance with 10 concurrent requests for faster scraping
-- ✅ Optimized session management with larger session pools (50 sessions)
-- ✅ Improved rate limiting (80 requests/minute) while maintaining stealth
-- ✅ Intelligent delay algorithms based on session maturity
-- ✅ Enhanced data accuracy and completeness
-- ✅ Better error handling and recovery
-- ✅ Added comprehensive job category detection
-- ✅ Improved handling of dynamic content
-
-### Roadmap
-- 🔄 Real-time job posting monitoring
-- 🔄 Advanced filtering and search options
-- 🔄 Integration with popular HR platforms
-- 🔄 Historical data collection and trends
-- 🔄 Multi-language support for international jobs
-
----
-
-**🔒 Compliance Note**: This actor is designed for legitimate business intelligence and research purposes. Always respect Shine.com's terms of service and applicable data protection regulations. Use responsibly and ethically.
+This actor is designed for legitimate data collection purposes. Users are responsible for ensuring compliance with Shine.com terms of service and applicable laws. Use data responsibly and respect rate limits.

@@ -1,6 +1,6 @@
 {
   "title": "Shine.com Jobs Scraper",
-  "description": "Scrape jobs from Shine.com. Provide either keyword/location/category OR a Shine.com search URL (startUrl, url, or startUrls). Actor paginates and optionally scrapes detail pages.",
+  "description": "Scrape jobs from Shine.com using internal JSON endpoints (API-first). Provide either keyword/location OR a Shine.com search URL (startUrl, url, or startUrls). The actor paginates and can optionally fetch job details.",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
@@ -24,21 +24,33 @@
       "editor": "textfield",
       "prefill": "Bangalore"
     },
+    "collectDetails": {
+      "title": "Collect details",
+      "type": "boolean",
+      "description": "If enabled, fetches job detail data (description, skills, etc.).",
+      "editor": "checkbox",
+      "default": true
+    },
     "datePosted": {
       "title": "Job posting date filter",
       "type": "string",
       "description": "Filter jobs by how recently they were posted.",
-      "enum": ["anytime", "24hours", "7days", "30days", "90days"],
-      "enumTitles": ["Anytime", "Last 24 hours", "Last 7 days", "Last 30 days", "Last 90 days"],
+      "enum": [
+        "anytime",
+        "24hours",
+        "7days",
+        "30days",
+        "90days"
+      ],
+      "enumTitles": [
+        "Anytime",
+        "Last 24 hours",
+        "Last 7 days",
+        "Last 30 days",
+        "Last 90 days"
+      ],
       "default": "anytime",
       "editor": "select"
-    },
-    "collectDetails": {
-      "title": "Collect job details",
-      "type": "boolean",
-      "description": "If enabled, scraper opens job detail pages for full description.",
-      "editor": "checkbox",
-      "default": true
     },
     "results_wanted": {
       "title": "Maximum number of jobs",
@@ -59,31 +71,8 @@
     "proxyConfiguration": {
       "title": "Proxy configuration",
       "type": "object",
-      "description": "Use Apify Proxy (datacenter recommended for Shine.com).",
-      "editor": "proxy",
-      "default": {
-        "useApifyProxy": true,
-        "apifyProxyGroups": ["RESIDENTIAL"]
-      }
-    },
-    "cookies": {
-      "title": "Custom cookies (raw header)",
-      "type": "string",
-      "description": "Optional raw 'Cookie' header string. Can help bypass consent banners.",
-      "editor": "textfield"
-    },
-    "cookiesJson": {
-      "title": "Custom cookies (JSON)",
-      "type": "string",
-      "description": "Optional JSON-formatted cookies. Accepts an array (e.g., [{\"name\":\"a\",\"value\":\"1\"}]) or an object map (e.g., {\"a\":\"1\"}).",
-      "editor": "textarea"
-    },
-    "dedupe": {
-      "title": "Deduplicate results",
-      "type": "boolean",
-      "description": "Remove duplicate job URLs from results (in-memory deduplication).",
-      "editor": "checkbox",
-      "default": true
+      "description": "Optional. On Apify platform, the actor enables Apify Proxy automatically if you leave this empty. For local runs, leave this empty to run without Apify Proxy (recommended).",
+      "editor": "proxy"
     }
   },
   "required": [],
