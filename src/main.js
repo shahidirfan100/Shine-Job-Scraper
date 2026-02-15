@@ -638,7 +638,7 @@ async function main() {
     const {
         keyword = '',
         location = '',
-        results_wanted: RESULTS_WANTED_RAW = 100,
+        results_wanted: RESULTS_WANTED_RAW = 20,
         max_pages: MAX_PAGES_RAW = 20,
         datePosted = 'anytime',
         collectDetails = true,

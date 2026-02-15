@@ -35,7 +35,6 @@ Research job requirements, experience levels, and skill gaps in target industrie
 | `datePosted` | String | No | `"anytime"` | Filter by posting date (anytime, 24hours, 7days, 30days, 90days) |
 | `results_wanted` | Integer | No | `100` | Maximum number of jobs to collect |
 | `max_pages` | Integer | No | `20` | Maximum search result pages to process |
-| `proxyConfiguration` | Object | No | Residential proxies | Proxy settings for reliable scraping |
 
 ## Output Data
 
@@ -127,19 +126,6 @@ Scrape from a specific Shine.com search page:
 - Increase gradually for production runs
 - Monitor API rate limits and response times
 
-### Proxy Configuration
-
-For reliable results, residential proxies are recommended:
-
-```json
-{
-    "proxyConfiguration": {
-        "useApifyProxy": true,
-        "apifyProxyGroups": ["RESIDENTIAL"]
-    }
-}
-```
-
 ## Integrations
 
 Connect your job data with:
@@ -161,7 +147,7 @@ Download data in multiple formats:
 ## Frequently Asked Questions
 
 ### How many jobs can I collect?
-You can collect up to the available jobs on Shine.com. The practical limit depends on your search criteria and proxy configuration.
+You can collect up to the available jobs on Shine.com. The practical limit depends on your search criteria.
 
 ### Can I search for jobs in multiple locations?
 Yes, you can run separate actor instances for different locations or use broader search terms.
